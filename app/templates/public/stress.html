@@ -1,0 +1,67 @@
+{% extends "public/templates/public_template.html" %}
+{% block main %}
+    <h1>Stress files for {{ current_user.username }} ({{ files.total }} files)</h1>
+    <div class="content-section">
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">New File</legend>
+                <div class="form-group">
+                    {% if form.title.errors %}
+                        {{ form.title(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.title.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.title(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                </fieldset>
+            <div class="form-group" align="right">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+    <div class="content-section">
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Archive</legend>
+                <div class="table">
+                    <table>
+                        <tr>
+                            <th>File</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Action</th>
+                        </tr>
+                        {% for row in files.items %}
+                            <tr>
+                                <td>{{ row.title }}</td>
+                                <td>{{ row.date_posted.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ row.date_posted.strftime('%H:%M:%S') }}</td>
+                                <td>
+                                    <a href="/stress/run/{{ row.id }}" class="btn btn-success btn-xs">Run</a>
+                                    <a href="/stress/review/{{ row.id }}" class="btn btn-info btn-xs">Review</a>
+                                    <a href="/stress/delete/{{ row.id }}" class="btn btn-danger btn-xs" onclick="return confirm('Are you sure?')">Delete</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+        </fieldset>
+    </div>
+    {% for page_num in files.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=3) %}
+        {% if page_num %}
+            {% if files.page == page_num %}
+                <a class="btn btn-info mb-4" href="{{ url_for('spectra.stress', page=page_num) }}">{{ page_num }}</a>
+            {% else %}
+                <a class="btn btn-outline-info mb-4" href="{{ url_for('spectra.stress', page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+        {% else %}
+            ...
+        {% endif %}
+    {% endfor %}
+{% endblock %}
+
+
